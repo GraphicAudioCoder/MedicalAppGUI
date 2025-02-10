@@ -96,7 +96,7 @@ classdef UserWindow < handle
             obj.environmentPanel = EnvironmentPanel(mainWindow, controller);
             obj.listenerPanel = ListenerPanel(mainWindow, controller);
             obj.targetSpeakerPanel = TargetSpeakerPanel(mainWindow, controller);
-            obj.maskingNoisePanel = MaskingNoisePanel(mainWindow);
+            obj.maskingNoisePanel = MaskingNoisePanel(mainWindow, controller);
             obj.testSettingsPanel = TestSettingsPanel(mainWindow);
 
             obj.controller.patientPanel = obj.patientPanel;
@@ -133,10 +133,10 @@ classdef UserWindow < handle
 
             % Test Label
             testLabel = uilabel(mainWindow, ...
-                'Text', 'Test Configuration', ...
-                'Position', [240, figPosition(4)-50, figPosition(3)*0.6, 30], ...
+                'Text', 'TEST CONFIGURATION', ...
+                'Position', [280, figPosition(4)-50, figPosition(3)*0.6, 30], ...
                 'FontSize', MODE_FONT_SIZE, ...
-                'FontName', 'Arial', ...
+                'FontName', MAIN_FONT, ...
                 'FontColor', theme.USER_LABEL_COLOR, ...
                 'HorizontalAlignment', 'left', ...
                 'FontWeight', 'bold');
@@ -511,6 +511,24 @@ classdef UserWindow < handle
             maskingNoiseTab = obj.components('maskingNoiseTab');
             testSettingsTab = obj.components('testSettingsTab');
             
+            % Check if the environment is selected
+            selectedEnvironmentLabel = obj.controller.environmentPanel.components('selectedLabel');
+            if obj.tabPosition == 2 && isempty(strtrim(strrep(selectedEnvironmentLabel.Text, 'Selected environment: ', '')))
+                return; % Do not proceed if the environment is not selected
+            end
+
+            % Check if the listener is selected
+            selectedListenerLabel = obj.controller.listenerPanel.components('selectedLabel');
+            if obj.tabPosition == 3 && isempty(strtrim(strrep(selectedListenerLabel.Text, 'Selected listener: ', '')))
+                return; % Do not proceed if the listener is not selected
+            end
+
+            % Check if the target speaker is selected
+            selectedTargetLabel = obj.controller.targetSpeakerPanel.components('selectedLabel');
+            if obj.tabPosition == 4 && isempty(strtrim(strrep(selectedTargetLabel.Text, 'Selected Target: ', '')))
+                return; % Do not proceed if the target speaker is not selected
+            end
+
             if obj.tabPosition == 1
                 patientTab.BackgroundColor = theme.USER_COMPLETED_TABS_COLOR;
 
@@ -648,7 +666,8 @@ classdef UserWindow < handle
             obj.patientPanel.changeColors(currentColors);
             obj.environmentPanel.changeColors(currentColors);
             obj.listenerPanel.changeColors(currentColors);
-            obj.targetSpeakerPanel.changeColors(currentColors); 
+            obj.targetSpeakerPanel.changeColors(currentColors);
+            obj.maskingNoisePanel.changeColors(currentColors);
         end
 
         % Helper function to update the color of a tab

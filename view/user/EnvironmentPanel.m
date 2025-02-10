@@ -44,7 +44,17 @@ classdef EnvironmentPanel < handle
                 panel.Layout.Column = 1;
 
                 labelText = sceneNames{i};
-                imgPath = fullfile(fileparts(mfilename('fullpath')), ['../../scenes/', fileNames{i}, '/', fileNames{i}, '_plan.png']);
+                
+                % Determine the image path (either PNG or JPG)
+                pngPath = fullfile(fileparts(mfilename('fullpath')), ['../../scenes/', fileNames{i}, '/', fileNames{i}, '_plan.png']);
+                jpgPath = fullfile(fileparts(mfilename('fullpath')), ['../../scenes/', fileNames{i}, '/', fileNames{i}, '_plan.jpg']);
+                if exist(pngPath, 'file')
+                    imgPath = pngPath;
+                elseif exist(jpgPath, 'file')
+                    imgPath = jpgPath;
+                else
+                    imgPath = ''; % Default to empty if no image found
+                end
 
                 % Label for the left side of the panel
                 labelName = sprintf('label%d', i);
@@ -68,6 +78,10 @@ classdef EnvironmentPanel < handle
                 'ButtonPushedFcn', @(btn, event) obj.onImageButtonPushed(btn, i, fileNames{i}));
                 obj.components(imgButtonName) = imgButton;  
 
+                % Load the scene .mat file to get acousticalSpecs
+                sceneData = load(fullfile(fileparts(mfilename('fullpath')), ['../../scenes/', fileNames{i}, '/', fileNames{i}, '.mat']));
+                acousticalSpecs = sceneData.acousticalSpecs;
+
                 % Text area and Label for the right side of the panel
                 textAreaLabel = uilabel(panel, ...
                     'Text', 'Acoustical specs:', ...
@@ -79,7 +93,7 @@ classdef EnvironmentPanel < handle
                     'Position', [500, 205, 200, 30]);
 
                 textArea = uitextarea(panel, ...
-                    'Value', {'T30'}, ...
+                    'Value', acousticalSpecs, ...
                     'FontSize', SPECS_FONT_SIZE, ...
                     'FontName', SPECS_FONT, ...
                     'FontColor', theme.USER_LABEL_COLOR, ...
@@ -147,11 +161,23 @@ classdef EnvironmentPanel < handle
 
         % Callback for the image button press
         function onImageButtonPushed(obj, btn, imgIndex, fileName)
-            imgPaths = {
-                fullfile(fileparts(mfilename('fullpath')), ['../../scenes/', fileName, '/', fileName, '_plan.png']), ...
-                fullfile(fileparts(mfilename('fullpath')), ['../../scenes/', fileName, '/', fileName, '_photo.png']), ...
-                fullfile(fileparts(mfilename('fullpath')), ['../../scenes/', fileName, '/', fileName, '_3d.png'])
-            };
+            % Determine the file extension of the current image
+            [~, ~, ext] = fileparts(btn.Icon);
+            
+            % Set the image paths based on the current extension
+            if strcmp(ext, '.png')
+                imgPaths = {
+                    fullfile(fileparts(mfilename('fullpath')), ['../../scenes/', fileName, '/', fileName, '_plan.png']), ...
+                    fullfile(fileparts(mfilename('fullpath')), ['../../scenes/', fileName, '/', fileName, '_photo.png']), ...
+                    fullfile(fileparts(mfilename('fullpath')), ['../../scenes/', fileName, '/', fileName, '_3d.png'])
+                };
+            else
+                imgPaths = {
+                    fullfile(fileparts(mfilename('fullpath')), ['../../scenes/', fileName, '/', fileName, '_plan.jpg']), ...
+                    fullfile(fileparts(mfilename('fullpath')), ['../../scenes/', fileName, '/', fileName, '_photo.jpg']), ...
+                    fullfile(fileparts(mfilename('fullpath')), ['../../scenes/', fileName, '/', fileName, '_3d.jpg'])
+                };
+            end
             
             if isempty(imgPaths)
                 disp('Error: imgPaths is empty.');

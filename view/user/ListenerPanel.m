@@ -125,9 +125,10 @@ classdef ListenerPanel < handle
 
             % Get listener images
             listenerPath = fullfile(currentScene.scenePath, 'listeners');
-            listenerDirs = dir(listenerPath);
-            listenerDirs = listenerDirs(~[listenerDirs.isdir]);
-            numListeners = numel(listenerDirs);
+            listenerFilesPng = dir(fullfile(listenerPath, '*.png'));
+            listenerFilesJpg = dir(fullfile(listenerPath, '*.jpg'));
+            listenerFiles = [listenerFilesPng; listenerFilesJpg];
+            numListeners = numel(listenerFiles);
 
             % Set all components to invisible
             obj.setVisibility(false);
@@ -146,7 +147,7 @@ classdef ListenerPanel < handle
                 panel.Layout.Column = 1;
 
                 labelText = sprintf('Listener %d', i);
-                imgPath = fullfile(listenerPath, listenerDirs(i).name);
+                imgPath = fullfile(listenerPath, listenerFiles(i).name);
 
                 % Label for the left side of the panel
                 labelName = sprintf('label%d', i);

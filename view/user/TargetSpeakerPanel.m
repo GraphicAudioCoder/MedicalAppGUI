@@ -87,11 +87,10 @@ classdef TargetSpeakerPanel < handle
 
             % Get listener images
             targetPath = fullfile(currentScene.scenePath, 'targets');
-            targetFiles = dir(fullfile(targetPath, sprintf('%s_listener_%d_target_*.png', currentScene.sceneFileName, obj.controller.currentScene.listenerNum)));
-            numTargets = numel(targetFiles);
-
-            % Display number of targets
-            disp(['Number of targets: ', num2str(numTargets)]);
+            targetFilesPng = dir(fullfile(targetPath, sprintf('%s_listener_%d_target_*.png', currentScene.sceneFileName, obj.controller.currentScene.listenerNum)));
+            targetFilesJpg = dir(fullfile(targetPath, sprintf('%s_listener_%d_target_*.jpg', currentScene.sceneFileName, obj.controller.currentScene.listenerNum)));
+            targetFiles = [targetFilesPng; targetFilesJpg];
+            numTargets = numel(targetFiles);   
 
             imgOffset = 30;
             ampY = 300;
@@ -139,7 +138,8 @@ classdef TargetSpeakerPanel < handle
                     'FontSize', NEXT_BTN_FONT_SIZE, ...
                     'FontName', MAIN_FONT, ...
                     'FontColor', theme.USER_LABEL_COLOR, ...
-                    'Position', [550, ampY, 200, 30]);
+                    'Position', [550, ampY, 200, 30], ...
+                    'Tooltip', 'Check to amplify the target speaker');
                 obj.components(checkButtonName) = checkButton;  
 
                 % TextArea for the right side of the panel
@@ -149,7 +149,7 @@ classdef TargetSpeakerPanel < handle
                     'FontSize', SPECS_FONT_SIZE, ...
                     'FontName', SPECS_FONT, ...
                     'FontColor', theme.USER_LABEL_COLOR, ...
-                    'BackgroundColor', theme.USER_GUI_ELEM_COLOR_ONE, ...
+                    'BackgroundColor', theme.USER_PANEL_COLOR, ...
                     'Editable', 'off', ...
                     'Position', [550, ampY - 160, 180, 130]);
                 obj.components(textAreaName) = textArea;
@@ -189,7 +189,7 @@ classdef TargetSpeakerPanel < handle
                 end
             end
             selectedLabel = obj.components('selectedLabel');
-            selectedLabel.Text = sprintf('Selected Target:');
+            selectedLabel.Text = sprintf('Selected Target: ');
         end
 
         % Change theme
@@ -219,7 +219,7 @@ classdef TargetSpeakerPanel < handle
                 end
 
                 if isa(component, 'matlab.ui.control.TextArea')
-                    component.BackgroundColor = currentColors.USER_GUI_ELEM_COLOR_ONE;
+                    component.BackgroundColor = currentColors.USER_PANEL_COLOR;
                     component.FontColor = currentColors.USER_LABEL_COLOR;
                 end
 

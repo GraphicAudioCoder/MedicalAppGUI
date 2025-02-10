@@ -64,7 +64,6 @@ classdef MainController < handle
                     % Save the patient data
                     try
                         save(obj.currentPatient.filePath, 'patientData');
-                        disp(['Data saved to: ', obj.currentPatient.filePath]);
                         success = true;
                     catch
                         disp('Error: Unable to save the patient data.');
@@ -94,8 +93,16 @@ classdef MainController < handle
                 obj.currentPatient.dateOfBirth = patientData.dateOfBirth;
                 obj.currentPatient.history = patientData.history;
 
+                % Remove empty notes from history
+                obj.currentPatient = obj.currentPatient.removeEmptyNotes();
+
+                % Print the history
+                disp('Current patient history:');
+                for i = 1:length(obj.currentPatient.history)
+                    disp(['Date: ', char(obj.currentPatient.history(i).date), ', Text: ', obj.currentPatient.history(i).text]);
+                end
+
                 [prevHistory, currHistory] = obj.currentPatient.getSplitHistory();
-                obj.currentPatient = obj.currentPatient.addNotes('');
                 name = obj.currentPatient.name;
                 surname = obj.currentPatient.surname;
                 dob = obj.currentPatient.dateOfBirth;
